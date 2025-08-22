@@ -1,5 +1,5 @@
 from django.contrib.auth import aget_user
-
+from django.contrib.auth import authenticate
 from .models import CutomUser
 from rest_framework import  serializers
 from rest_framework.generics import GenericAPIView
@@ -33,4 +33,21 @@ class  RegisterSerializers(serializers.ModelSerializer):
             addres=validated_data.get('addres')
         )
         return user
+
+class LoginSerializer(serializers.Serializer):
+    email=serializers.EmailField()
+    password=serializers.CharField(write_only=True,max_length=12)
+
+    def validate(self, data):
+        email=data.get('email')
+        password=data.get('password')
+
+        if not email and not password:
+            raise ValidationError({'msg':'Login yoki parolni toliq kirting!'})
+        user=authenticate(email=email,password=password)
+        if not user:
+            raise ValidationError({'msg':'Login yoki parol notogri'})
+        data['user']=user
+        return data
+
 

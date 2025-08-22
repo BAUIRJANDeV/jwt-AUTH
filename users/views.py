@@ -5,9 +5,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from .models import CutomUser
-from .serializers import RegisterSerializers
+from .serializers import RegisterSerializers,LoginSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class RegisterApi(GenericAPIView):
@@ -28,8 +30,40 @@ def test(request):
     return Response({'data':True})
 
 
+class LoginApi(APIView):
+    permission_classes = [AllowAny]
+    def post(self,request):
+        serializer=LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user=serializer.validated_data['user']
+            token=RefreshToken.for_user(user)
+            refresh=str(token)
+            access=str(token.access_token)
+            data={
+                'refresh':refresh,
+                'access':access,
+                'status':status.HTTP_200_OK
+            }
+            return Response(data)
+        return Response({"errors":serializer.errors,'status':status.HTTP_400_BAD_REQUEST})
+
+class LogoutApi(APIView):
+    def post(self,request):
+        data=request.data
+        try:
+            token=RefreshToken(data['refresh'])
+            token.blacklist()
+            return Response({'msg':'Tizimdan chiqdingiz!'})
+        except Exception as e:
+            return Response({'errors':e,'staus':status.HTTP_400_BAD_REQUEST})
 
 
-
-
-
+class TokenRefresh(APIView):
+    permission_classes=[AllowAny]
+    def post(self,request):
+        data=request.data
+        try:
+            token=RefreshToken(data['refresh'])
+            return Response({'access':str(token.access_token),'status':status.HTTP_200_OK})
+        except Exception as e:
+            return Response({'errors':e,'staus':status.HTTP_400_BAD_REQUEST})
