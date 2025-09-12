@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from .models import CutomUser
-from .serializers import RegisterSerializers,LoginSerializer
+from .serializers import RegisterSerializers,LoginSerializer,ProfileSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -67,3 +67,25 @@ class TokenRefresh(APIView):
             return Response({'access':str(token.access_token),'status':status.HTTP_200_OK})
         except Exception as e:
             return Response({'errors':e,'staus':status.HTTP_400_BAD_REQUEST})
+
+
+class Profile(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        serializer=ProfileSerializer(request.user)
+        return Response({'data':serializer.data})
+
+    def put(self, request):
+        serializer = ProfileSerializer(request.user, data=request.data, partial=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
+        return Response({'errors': serializer.errors, 'status': status.HTTP_400_BAD_REQUEST})
+
+    def patch(self,request):
+        serializer=ProfileSerializer(request.user,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response({'data':serializer.data,'status':status.HTTP_200_OK})
+        return Response({'errors':serializer.errors,'status':status.HTTP_400_BAD_REQUEST})

@@ -24,6 +24,7 @@ class PhoneSerializer(serializers.ModelSerializer):
             'category',
             'category_id',
             'price',
+            'image',
             'description',
             'created_at',
             'updated_at'

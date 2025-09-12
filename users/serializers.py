@@ -5,6 +5,7 @@ from rest_framework import  serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.validators import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import User
 
 
 class  RegisterSerializers(serializers.ModelSerializer):
@@ -49,5 +50,9 @@ class LoginSerializer(serializers.Serializer):
             raise ValidationError({'msg':'Login yoki parol notogri'})
         data['user']=user
         return data
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CutomUser
+        fields = ['email', 'addres', 'age']
 
 
