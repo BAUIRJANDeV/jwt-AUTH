@@ -29,3 +29,8 @@ class PhoneSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+class CategoryiSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']  # id ni ham qo‘shish foydali bo‘ladi
+
